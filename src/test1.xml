@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<LabCollection>
+    <LabWork>
+        <averagePoint>4</averagePoint>
+        <coordinates>
+            <x>1</x>
+            <y>2</y>
+        </coordinates>
+        <creationDate>2021-02-27T01:38:14.839+03:00[Europe/Moscow]</creationDate>
+        <difficulty>NORMAL</difficulty>
+        <discipline>
+            <labsCount>3</labsCount>
+            <name>abc</name>
+        </discipline>
+        <id>1</id>
+        <minimalPoint>3</minimalPoint>
+        <name>labcuatoi</name>
+        <tunedInWorks>2</tunedInWorks>
+    </LabWork>
+    <LabWork>
+        <averagePoint>4</averagePoint>
+        <coordinates>
+            <x>3</x>
+            <y>1</y>
+        </coordinates>
+        <creationDate>2021-02-27T01:38:14.839+03:00[Europe/Moscow]</creationDate>
+        <difficulty>NORMAL</difficulty>
+        <discipline>
+            <labsCount>4</labsCount>
+            <name>xyz</name>
+        </discipline>
+        <id>2</id>
+        <minimalPoint>4</minimalPoint>
+        <name>labcuaban</name>
+        <tunedInWorks>5</tunedInWorks>
+    </LabWork>
+</LabCollection>
