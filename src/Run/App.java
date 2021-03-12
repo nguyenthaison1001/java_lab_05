@@ -18,9 +18,6 @@ public class App {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String fileName = "D:\\Nguyen Thai Son\\Freshman\\Programming\\LabSerious\\Lab_05\\src\\testIn.xml";
 //            String fileName = args[0];
-            System.out.println("Try to commit!");
-            System.out.println("Try 2 to commit!");
-
 
             LabAsker labAsker = new LabAsker(reader);
             LabCollection labCollection = new LabCollection(new LinkedList<>());
