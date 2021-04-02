@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="lab_06.server:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lab_06_server_jar</output-path>
+    <root id="archive" name="lab_05.server.jar">
+      <element id="module-output" name="lab_05.server" />
+      <element id="module-output" name="lab_05.common" />
+      <element id="module-output" name="nhap" />
+    </root>
+  </artifact>
+</component>
