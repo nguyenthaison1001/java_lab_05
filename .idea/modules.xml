@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Lab_05.iml" filepath="$PROJECT_DIR$/Lab_05.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lab_05.iml" filepath="$PROJECT_DIR$/lab_05.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client/lab_05.client.iml" filepath="$PROJECT_DIR$/client/lab_05.client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/lab_05.common.iml" filepath="$PROJECT_DIR$/common/lab_05.common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/lab_05.server.iml" filepath="$PROJECT_DIR$/server/lab_05.server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nhap/nhap.iml" filepath="$PROJECT_DIR$/nhap/nhap.iml" />
     </modules>
   </component>
 </project>
