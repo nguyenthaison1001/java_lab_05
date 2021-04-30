@@ -1,44 +1,41 @@
 package commands;
 
-import data.LabWork;
+import exceptions.DatabaseHandlingException;
 import exceptions.WrongFormatCommandException;
 import interaction.LabRaw;
-import utility.LabCollection;
+import interaction.User;
+import utility.DatabaseCollectionManager;
+import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 /**
  * Command 'add'. Adds a new element to collection.
  */
 public class AddCommand extends AbstractCommand {
-    private final LabCollection labCollection;
+    private final CollectionManager collectionManager;
+    private final DatabaseCollectionManager databaseCollectionManager;
 
-    public AddCommand(LabCollection labCollection) {
+    public AddCommand(CollectionManager collectionManager, DatabaseCollectionManager databaseCollectionManager) {
         super("add", "{element}", "add new element to collection");
-        this.labCollection = labCollection;
+        this.collectionManager = collectionManager;
+        this.databaseCollectionManager = databaseCollectionManager;
     }
 
     /**
      * Executes the command.
      */
     @Override
-    public boolean execute(String stringArg, Object objectArg) {
+    public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg == null) throw new WrongFormatCommandException();
             LabRaw labRaw = (LabRaw) objectArg;
-            labCollection.getLabCollection().add(new LabWork(
-                    labCollection.generateID(),
-                    labRaw.getName(),
-                    labRaw.getCoordinates(),
-                    labRaw.getMinimalPoint(),
-                    labRaw.getTunedInWorks(),
-                    labRaw.getAveragePoint(),
-                    labRaw.getDifficulty(),
-                    labRaw.getDiscipline()
-            ));
+            collectionManager.getLabCollection().add(databaseCollectionManager.insertLab(labRaw, user));
             ResponseOutputer.appendln("LabWork added successfully!");
             return true;
         } catch (WrongFormatCommandException exception) {
             ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+        } catch (DatabaseHandlingException exception) {
+            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
         }
         return false;
     }

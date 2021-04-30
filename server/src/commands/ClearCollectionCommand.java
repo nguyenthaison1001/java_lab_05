@@ -1,41 +1,51 @@
 package commands;
 
-import exceptions.CollectionIsEmptyException;
-import exceptions.WrongFormatCommandException;
-import utility.LabCollection;
+import data.LabWork;
+import exceptions.*;
+import interaction.User;
+import utility.DatabaseCollectionManager;
+import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 /**
  * Command 'clear'.
  */
 public class ClearCollectionCommand extends AbstractCommand {
-    private final LabCollection labCollection;
+    private final CollectionManager collectionManager;
+    private final DatabaseCollectionManager databaseCollectionManager;
 
-    public ClearCollectionCommand(LabCollection labCollection) {
+    public ClearCollectionCommand(CollectionManager collectionManager, DatabaseCollectionManager databaseCollectionManager) {
         super("clear","", "clear collection");
-        this.labCollection = labCollection;
+        this.collectionManager = collectionManager;
+        this.databaseCollectionManager = databaseCollectionManager;
     }
 
     /**
      * Executes the command.
      */
     @Override
-    public boolean execute(String stringArg, Object objectArg) {
+    public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-            if (labCollection.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
-//            if (labAsker.areYouSure()) {
-                labCollection.getLabCollection().clear();
+            for (LabWork lab : collectionManager.getLabCollection()) {
+                if (!lab.getOwner().equals(user)) throw new PermissionDeniedException();
+                if (!databaseCollectionManager.checkLabUserID(lab.getId(), user))
+                    throw new ManualDatabaseEditException();
+            }
+            databaseCollectionManager.clearCollection();
+            collectionManager.getLabCollection().clear();
             ResponseOutputer.appendln("Cleared successfully!");
-//            }
-//            else {
-//                Console.println("Clear failed!");
-//            }
             return true;
         } catch (WrongFormatCommandException exception) {
             ResponseOutputer.appendWarning("Using: '" + getName() + "'");
-        } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
+        } catch (DatabaseHandlingException exception) {
+            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+        } catch (PermissionDeniedException exception) {
+            ResponseOutputer.appendError("Недостаточно прав для выполнения данной команды!");
+            ResponseOutputer.appendln("Принадлежащие другим пользователям объекты доступны только для чтения.");
+        } catch (ManualDatabaseEditException exception) {
+            ResponseOutputer.appendError("Произошло прямое изменение базы данных!");
+            ResponseOutputer.appendln("Перезапустите клиент для избежания возможных ошибок.");
         }
         return false;
     }

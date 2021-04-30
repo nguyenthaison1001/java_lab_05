@@ -1,5 +1,7 @@
 package commands;
 
+import interaction.User;
+
 /**
  * Interface for commands.
  */
@@ -10,5 +12,5 @@ public interface Command {
 
     String getDescription();
 
-    boolean execute(String commandStringArg, Object commandObjectArg);
+    boolean execute(String commandStringArg, Object commandObjectArg, User user);
 }

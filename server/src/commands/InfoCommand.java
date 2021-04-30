@@ -1,8 +1,8 @@
 package commands;
 
 import exceptions.WrongFormatCommandException;
-import utility.FileManager;
-import utility.LabCollection;
+import interaction.User;
+import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 import java.time.ZonedDateTime;
@@ -11,33 +11,27 @@ import java.time.ZonedDateTime;
  * Command 'info'.
  */
 public class InfoCommand extends AbstractCommand {
-    private final LabCollection labCollection;
-    private final FileManager fileManager;
+    private final CollectionManager collectionManager;
 
-    public InfoCommand(LabCollection labCollection, FileManager fileManager) {
+    public InfoCommand(CollectionManager collectionManager) {
         super("info","", "display information of collection");
-        this.labCollection = labCollection;
-        this.fileManager = fileManager;
+        this.collectionManager = collectionManager;
     }
 
     /**
      * Executes the command.
      */
     @Override
-    public boolean execute(String stringArg, Object objectArg) {
+    public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-//            ZonedDateTime lastSaveTime = fileManager.getLastSaveTime();
-            ZonedDateTime lastInitTime = fileManager.getLastInitTime();
-//            String lastSaveTimeString = (lastSaveTime == null) ? "saving hasn't happened yet" :
-//                    lastSaveTime.toLocalDate() + " " + lastSaveTime.toLocalTime();
+            ZonedDateTime lastInitTime = collectionManager.getLastInitTime();
             String lastInitTimeString = (lastInitTime == null) ? "initialization hasn't happened yet" :
                     lastInitTime.toLocalDate() + " " + lastInitTime.toLocalTime();
 
             ResponseOutputer.appendln("Information about collection:");
-            ResponseOutputer.appendln("-Type: " + labCollection.getLabCollection().getClass().getName());
-            ResponseOutputer.appendln("-The number of elements: " + labCollection.getLabCollection().size());
-//            Console.println("-Last saving time: " + lastSaveTimeString);
+            ResponseOutputer.appendln("-Type: " + collectionManager.getLabCollection().getClass().getName());
+            ResponseOutputer.appendln("-The number of elements: " + collectionManager.getLabCollection().size());
             ResponseOutputer.appendln("-Last initializing time: " + lastInitTimeString);
             return true;
         } catch (WrongFormatCommandException exception) {

@@ -1,6 +1,6 @@
 package utility;
 
-import AppServer.AppClient;
+import client.AppClient;
 import data.Coordinates;
 import data.Difficulty;
 import data.Discipline;
@@ -11,6 +11,7 @@ import exceptions.ScriptRecursionException;
 import interaction.LabRaw;
 import interaction.Request;
 import interaction.ResponseCode;
+import interaction.User;
 
 import java.io.*;
 import java.util.*;
@@ -29,7 +30,7 @@ public class UserHandler {
         this.userReader = userReader;
     }
 
-    public Request handle(ResponseCode serverResponseCode) {
+    public Request handle(ResponseCode serverResponseCode, User user) {
         String userInput = null;
         String[] userCommand;
         ProcessingCode processingCode;
@@ -75,20 +76,20 @@ public class UserHandler {
 
                 processingCode = processCommand(userCommand[0], userCommand[1]);
 
-            } while (processingCode == ProcessingCode.ERROR);
+            } while (processingCode == ProcessingCode.ERROR && !isScriptMode() || userCommand[0].isEmpty());
 
             try {
-                if ((serverResponseCode == ResponseCode.ERROR))
+                if (isScriptMode() && (serverResponseCode == ResponseCode.ERROR || processingCode == ProcessingCode.ERROR))
                     throw new IncorrectInputInScriptException();
                 switch (processingCode) {
                     case OBJECT:
                         LabRaw labAddRaw = generateLabToAdd();
-                        return new Request(userCommand[0], userCommand[1], labAddRaw);
+                        return new Request(userCommand[0], userCommand[1], labAddRaw, user);
                     case UPDATE_OBJECT:
                         LabRaw labUpdateRaw = generateLabToUpdate();
-                        return new Request(userCommand[0], userCommand[1], labUpdateRaw);
+                        return new Request(userCommand[0], userCommand[1], labUpdateRaw, user);
                     case REMOVE_GREATER:
-                        return new Request(userCommand[0], utilityRemoveGreater());
+                        return new Request(userCommand[0], utilityRemoveGreater(), user);
                     case SCRIPT:
                         File scriptFile = new File(userCommand[1]);
                         if (!scriptFile.exists()) throw new FileNotFoundException();
@@ -118,11 +119,10 @@ public class UserHandler {
                 Outputer.printError("IOException occurred");
                 System.exit(0);
             }
-            return new Request();
+            return new Request(user);
         }
-        return new Request(userCommand[0], userCommand[1]);
+        return new Request(userCommand[0], userCommand[1], user);
     }
-
 
 //    /**
 //     * Launches the command.
@@ -141,14 +141,12 @@ public class UserHandler {
                 case "info":
                 case "exit":
                 case "clear":
-                case "remove_first":
                 case "sum_of_minimal_point":
                     if (!commandArg.isEmpty()) throw new CommandUsageException();
                     break;
 
                 case "add":
                 case "add_if_min":
-
                     if (!commandArg.isEmpty()) throw new CommandUsageException("{element}");
                     return ProcessingCode.OBJECT;
 

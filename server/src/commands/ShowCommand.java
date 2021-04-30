@@ -1,30 +1,30 @@
 package commands;
 
 import exceptions.WrongFormatCommandException;
-import utility.LabCollection;
+import interaction.User;
+import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 /**
  * Command 'show'.
  */
 public class ShowCommand extends AbstractCommand {
-    private final LabCollection labCollection;
+    private final CollectionManager collectionManager;
 
-    public ShowCommand(LabCollection labCollection) {
+    public ShowCommand(CollectionManager collectionManager) {
         super("show","", "display all elements of the collection");
-        this.labCollection = labCollection;
+        this.collectionManager = collectionManager;
     }
 
     /**
      * Executes the command.
      */
     @Override
-    public boolean execute(String stringArg, Object objectArg) {
+    public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-//            ResponseOutputer.appendln(labCollection.showCollection());
-            labCollection.sortByName();
-            ResponseOutputer.appendln(labCollection.showCollection());
+            collectionManager.sortByID();
+            ResponseOutputer.appendln(collectionManager.showCollection());
             return true;
         } catch (WrongFormatCommandException exception) {
             ResponseOutputer.appendWarning("Using: '" + getName() + "'");

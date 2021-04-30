@@ -1,9 +1,12 @@
-package AppServer;
+package client;
 
 import exceptions.ConnectionErrorException;
 import exceptions.NotInDeclaredLimitsException;
 import interaction.Request;
 import interaction.Response;
+import interaction.ResponseCode;
+import interaction.User;
+import utility.AuthHandler;
 import utility.Outputer;
 import utility.UserHandler;
 
@@ -20,24 +23,28 @@ public class Client {
     private int maxReconnectionAttempts;
     private DatagramChannel clientChannel;
     private UserHandler userHandler;
+    private AuthHandler authHandler;
     private SocketAddress addr;
+    private User user;
 
-    public Client(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts, UserHandler userHandler) {
+    public Client(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts, UserHandler userHandler, AuthHandler authHandler) {
         this.host = host;
         this.port = port;
         this.reconnectionTimeout = reconnectionTimeout;
         this.maxReconnectionAttempts = maxReconnectionAttempts;
         this.userHandler = userHandler;
+        this.authHandler = authHandler;
     }
 
     public void run() {
         try {
-            boolean processingStatus = true;
-            while (processingStatus) {
+            while (true) {
                 try {
-                    checkAddress();
+//                    checkAddress();
                     connectToServer();
-                    processingStatus = processing(clientChannel, addr);
+                    processUserAuthentication();
+                    processRequestToServer(clientChannel, addr);
+                    break;
                 } catch (ConnectionErrorException exception) {
                     if (reconnectionAttempts >= maxReconnectionAttempts) {
                         Outputer.printError("Connection attempts exceeded!");
@@ -60,8 +67,8 @@ public class Client {
             if (clientChannel!= null) clientChannel.close();
             Outputer.println("Client shutdown!");
 
-        } catch (NotInDeclaredLimitsException exception) {
-            Outputer.printError("The client can't be started!");
+//        } catch (NotInDeclaredLimitsException exception) {
+//            Outputer.printError("The client can't be started!");
         } catch (IOException exception) {
             Outputer.printError("An error occurred while trying to end the connection to the server!");
         }
@@ -95,14 +102,12 @@ public class Client {
         }
     }
 
-    private boolean processing(DatagramChannel clientChannel, SocketAddress addr) throws ConnectionErrorException {
+    private void processUserAuthentication() throws ConnectionErrorException {
         Con con = new Con();
-        while (true) {
+        do {
             try {
-                con.request = con.response != null ? userHandler.handle(con.response.getResponseCode()) :
-                        userHandler.handle(null);
+                con.request = authHandler.handle();
 
-                if (con.request.getCommandName().equals("exit")) break;
                 if (con.request.isEmpty()) continue;
 
                 send(clientChannel, con, addr);
@@ -118,8 +123,34 @@ public class Client {
                 reconnectionAttempts++;
                 connectToServer();
             }
-        }
-        return false;
+        } while (con.response == null || !con.response.getResponseCode().equals(ResponseCode.OK));
+        // y nghia cua while: khi nao authenticating login thanh cong -> stop loop
+        user = con.request.getUser();
+    }
+
+    private void processRequestToServer(DatagramChannel clientChannel, SocketAddress addr) throws ConnectionErrorException {
+        Con con = new Con();
+        do {
+            try {
+                con.request = con.response != null ? userHandler.handle(con.response.getResponseCode(), user) :
+                        userHandler.handle(null, user);
+
+                if (con.request.isEmpty()) continue;
+
+                send(clientChannel, con, addr);
+                receive(clientChannel, con);
+
+                Outputer.print(con.response.getResponseBody());
+            } catch (InvalidClassException | NotSerializableException exception) {
+                Outputer.printError("An error occurred while sending data to the server!");
+            } catch (ClassNotFoundException exception) {
+                Outputer.printError("An error occurred while reading the received data!");
+            } catch (IOException exception) {
+                Outputer.printError("The connection to the server has been dropped!");
+                reconnectionAttempts++;
+                connectToServer();
+            }
+        } while (!con.request.getCommandName().equals("exit"));
     }
 
     private void send(DatagramChannel clientChannel, Con con, SocketAddress addr) throws IOException {

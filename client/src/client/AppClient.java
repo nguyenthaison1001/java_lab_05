@@ -1,16 +1,14 @@
-package AppServer;
+package client;
 
 import exceptions.NotInDeclaredLimitsException;
 import exceptions.WrongFormatCommandException;
+import utility.AuthHandler;
 import utility.Outputer;
 import utility.UserHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Scanner;
 
 public class AppClient {
     public static final String PS1 = "$ ";
@@ -19,10 +17,36 @@ public class AppClient {
     private static final int RECONNECTION_TIMEOUT = 5 * 1000;
     private static final int MAX_RECONNECTION_ATTEMPTS = 5;
 
-    private static String host= "127.0.0.1";
+    private static String host = "se.ifmo.ru";
 //    = "127.0.0.1";
     private static int port = 4387;
 //    = 4387;
+
+    public static void main(String[] args) throws IOException {
+        Outputer.println("Welcome to app!");
+
+//      - run in IDE
+//        Scanner scanner = new Scanner(System.in);
+//        String host1 = scanner.nextLine();
+//        String[] hostAndPort = (host1.trim() + " ").split(" ", 2);
+//        hostAndPort[0] = hostAndPort[0].trim();
+//        hostAndPort[1] = hostAndPort[1].trim();
+
+//        if (!initializeConnectionAddress(hostAndPort)) return;
+
+//        if (!initializeConnectionAddress(args)) return;
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        AuthHandler authHandler = new AuthHandler(reader);
+        UserHandler userHandler = new UserHandler(reader);
+
+//      - run in ide
+//        Client client = new Client(hostAndPort[0], port, CONNECTION_TIMEOUT, userHandler);
+
+        Client client = new Client(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS, userHandler, authHandler);
+        client.run();
+        reader.close();
+    }
 
     private static boolean initializeConnectionAddress(String[] hostAndPortArgs) {
         try {
@@ -44,30 +68,5 @@ public class AppClient {
             Outputer.printError("Port can't be negative!");
         }
         return false;
-    }
-
-    public static void main(String[] args) throws IOException {
-        Outputer.println("Welcome to app!");
-
-//      - run in IDE
-//        Scanner scanner = new Scanner(System.in);
-//        String host1 = scanner.nextLine();
-//        String[] hostAndPort = (host1.trim() + " ").split(" ", 2);
-//        hostAndPort[0] = hostAndPort[0].trim();
-//        hostAndPort[1] = hostAndPort[1].trim();
-
-//        if (!initializeConnectionAddress(hostAndPort)) return;
-
-//        if (!initializeConnectionAddress(args)) return;
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        UserHandler userHandler = new UserHandler(reader);
-
-//      - run in ide
-//        Client client = new Client(hostAndPort[0], port, CONNECTION_TIMEOUT, userHandler);
-
-        Client client = new Client(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS, userHandler);
-        client.run();
-        reader.close();
     }
 }

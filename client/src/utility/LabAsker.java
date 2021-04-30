@@ -1,6 +1,6 @@
 package utility;
 
-import AppServer.AppClient;
+import client.AppClient;
 import data.Coordinates;
 import data.Difficulty;
 import data.Discipline;

@@ -1,5 +1,6 @@
 package data;
 
+import interaction.User;
 import utility.ZonedDateTimeXMLAdapter;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -22,20 +23,24 @@ public class LabWork implements Comparable<LabWork> {
     private Integer averagePoint; //Значение поля должно быть больше 0
     private Difficulty difficulty; //Поле может быть null
     private Discipline discipline; //Поле не может быть null
+    private User owner;
 
     public LabWork() {}
 
-    public LabWork(Integer id, String name, Coordinates coordinates, long minimalPoint, int tunedInWorks, int averagePoint, Difficulty difficulty, Discipline discipline) {
+    public LabWork(Integer id, String name, Coordinates coordinates, ZonedDateTime creationDate, long minimalPoint, int tunedInWorks,
+                   int averagePoint, Difficulty difficulty, Discipline discipline, User owner) {
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
-        creationDate = ZonedDateTime.now();
+        this.creationDate = creationDate;
         this.minimalPoint = minimalPoint;
         this.tunedInWorks = tunedInWorks;
         this.averagePoint = averagePoint;
         this.difficulty = difficulty;
         this.discipline = discipline;
+        this.owner = owner;
     }
+
     /**
      * @return ID of the LabWork.
      */
@@ -109,6 +114,13 @@ public class LabWork implements Comparable<LabWork> {
         return discipline;
     }
 
+    /**
+     * @return Owner of the marine.
+     */
+    public User getOwner() {
+        return owner;
+    }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -149,7 +161,8 @@ public class LabWork implements Comparable<LabWork> {
     public String toString() {
         return "LabWork{" +
                 "\n\t id: " + id +
-                ",\n\t name: '" + name + '\'' +
+                ",\n\t user: '" + owner.getUsername() +
+                ",\n\t name: '" + name  +
                 ",\n\t coordinates: " + coordinates +
                 ",\n\t creationDate: " + creationDate +
                 ",\n\t minimalPoint: " + minimalPoint +

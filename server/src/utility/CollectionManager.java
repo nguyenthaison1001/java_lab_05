@@ -1,24 +1,31 @@
 package utility;
 
 import data.LabWork;
+import exceptions.DatabaseHandlingException;
+import interaction.LabRaw;
+import interaction.User;
+import server.AppServer;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
-@XmlRootElement(name = "LabCollection")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class LabCollection {
-    @XmlElement(name = "LabWork")
+public class CollectionManager {
     private LinkedList<LabWork> labCollection;
+    private ZonedDateTime lastInitTime;
+    private DatabaseCollectionManager databaseCollectionManager;
 
-    public LabCollection() {}
+    public CollectionManager(DatabaseCollectionManager databaseCollectionManager) {
+        this.databaseCollectionManager = databaseCollectionManager;
 
-    public LabCollection(LinkedList<LabWork> labCollection) {
-        this.labCollection = labCollection;
+        loadCollection();
     }
 
     public LinkedList<LabWork> getLabCollection() {
@@ -47,6 +54,10 @@ public class LabCollection {
         labCollection.sort(Comparator.comparing(LabWork::getName));
     }
 
+    public ZonedDateTime getLastInitTime() {
+        return lastInitTime;
+    }
+
     public LabWork getFirst() {
         return labCollection.stream().findFirst().orElse(null);
     }
@@ -70,5 +81,30 @@ public class LabCollection {
         if (labCollection.isEmpty()) return "The collection is empty!";
         return labCollection.stream()
                 .reduce("", (sum, m) -> sum += m + "\n\n", String::concat).trim();
+    }
+
+    public LinkedList<LabWork> getGreater(LabWork labToCompare) {
+        return labCollection.stream().filter(labWork -> labWork.compareTo(labToCompare) > 0).collect(
+                LinkedList::new,
+                LinkedList::add,
+                LinkedList::addAll
+        );
+    }
+
+    public void removeFromCollection(LabWork labWork) {
+        labCollection.remove(labWork);
+    }
+
+    private void loadCollection() {
+        try {
+            labCollection = databaseCollectionManager.getCollection();
+            lastInitTime = ZonedDateTime.now();
+            Outputer.println("Коллекция загружена.");
+            AppServer.LOGGER.info("Коллекция загружена.");
+        } catch (DatabaseHandlingException exception) {
+            labCollection = new LinkedList<>();
+            Outputer.printError("Коллекция не может быть загружена!");
+            AppServer.LOGGER.severe("Коллекция не может быть загружена!");
+        }
     }
 }

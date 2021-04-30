@@ -2,18 +2,19 @@ package commands;
 
 import exceptions.CollectionIsEmptyException;
 import exceptions.WrongFormatCommandException;
-import utility.LabCollection;
+import interaction.User;
+import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 /**
  * Command 'sum_of_minimal_point'.
  */
 public class SumMiniPointCommand extends AbstractCommand {
-    private final LabCollection labCollection;
+    private final CollectionManager collectionManager;
 
-    public SumMiniPointCommand(LabCollection labCollection) {
+    public SumMiniPointCommand(CollectionManager collectionManager) {
         super("sum_of_minimal_point","", "display the sum of the values of the minimalPoint field for all elements of the collection");
-        this.labCollection = labCollection;
+        this.collectionManager = collectionManager;
     }
 
 
@@ -21,12 +22,12 @@ public class SumMiniPointCommand extends AbstractCommand {
      * Executes the command.
      */
     @Override
-    public boolean execute(String stringArg, Object objectArg) {
+    public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-            if (labCollection.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
+            if (collectionManager.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
 
-            long sum = labCollection.getSumMiniPoint();
+            long sum = collectionManager.getSumMiniPoint();
             ResponseOutputer.appendln("Sum of minimal point = " + sum);
             return true;
         } catch (WrongFormatCommandException exception) {

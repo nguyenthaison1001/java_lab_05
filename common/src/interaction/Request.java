@@ -6,19 +6,21 @@ public class Request implements Serializable {
     private final String commandName;
     private final String commandStringArg;
     private final Serializable commandObjectArg;
+    private User user;
 
-    public Request(String commandName, String commandStringArg, Serializable commandObjectArg) {
+    public Request(String commandName, String commandStringArg, Serializable commandObjectArg, User user) {
         this.commandName = commandName;
         this.commandStringArg = commandStringArg;
         this.commandObjectArg = commandObjectArg;
+        this.user = user;
     }
 
-    public Request(String commandName, String commandStringArg) {
-        this(commandName, commandStringArg, null);
+    public Request(String commandName, String commandStringArg, User user) {
+        this(commandName, commandStringArg, null, user);
     }
 
-    public Request() {
-        this("", "");
+    public Request(User user) {
+        this("", "", user);
     }
 
     public String getCommandName() {
@@ -31,6 +33,10 @@ public class Request implements Serializable {
 
     public Object getCommandObjectArg() {
         return commandObjectArg;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     /**
