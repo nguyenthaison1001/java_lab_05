@@ -79,7 +79,7 @@ public class UserHandler {
             } while (processingCode == ProcessingCode.ERROR && !isScriptMode() || userCommand[0].isEmpty());
 
             try {
-                if (isScriptMode() && (serverResponseCode == ResponseCode.ERROR || processingCode == ProcessingCode.ERROR))
+                if (isScriptMode() && (/*serverResponseCode == ResponseCode.ERROR ||*/ processingCode == ProcessingCode.ERROR))
                     throw new IncorrectInputInScriptException();
                 switch (processingCode) {
                     case OBJECT:

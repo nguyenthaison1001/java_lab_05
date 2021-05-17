@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="lab_07_cli.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/lab_07_cli_jar</output-path>
+    <root id="archive" name="lab_05.client.jar">
+      <element id="module-output" name="lab_05.client" />
+      <element id="module-output" name="lab_05.common" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../PostgreSQL_installer/postgresql-42.2.19.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
