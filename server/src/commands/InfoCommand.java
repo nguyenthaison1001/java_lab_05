@@ -29,13 +29,15 @@ public class InfoCommand extends AbstractCommand {
             String lastInitTimeString = (lastInitTime == null) ? "initialization hasn't happened yet" :
                     lastInitTime.toLocalDate() + " " + lastInitTime.toLocalTime();
 
-            ResponseOutputer.appendln("Information about collection:");
-            ResponseOutputer.appendln("-Type: " + collectionManager.getLabCollection().getClass().getName());
-            ResponseOutputer.appendln("-The number of elements: " + collectionManager.getLabCollection().size());
-            ResponseOutputer.appendln("-Last initializing time: " + lastInitTimeString);
+            ResponseOutputer.append("CollectionInfo");
+            ResponseOutputer.appendArgs(
+                    collectionManager.getLabCollection().getClass().getName(),
+                    String.valueOf(collectionManager.getLabCollection().size()),
+                    lastInitTimeString);
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendln("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         }
         return false;
     }

@@ -19,15 +19,18 @@ import java.util.*;
 /**
  * Operates inputs/outputs in console.
  */
-public class UserHandler {
+public class ScriptHandler {
 
-    private BufferedReader userReader;
-    private final Stack<BufferedReader> readerStack = new Stack<>();
-    private final Stack<File> fileScriptStack = new Stack<>();
+    private Scanner userScanner;
+    private final Stack<Scanner> scannerStack = new Stack<>();
+    private final Stack<File> scriptStack = new Stack<>();
 
-
-    public UserHandler(BufferedReader userReader) {
-        this.userReader = userReader;
+    public ScriptHandler(File scriptFile) {
+        try {
+            userScanner = new Scanner(scriptFile);
+            scannerStack.add(userScanner);
+            scriptStack.add(scriptFile);
+        } catch (Exception exception) { /* ? */ }
     }
 
     public Request handle(ResponseCode serverResponseCode, User user) {
@@ -38,45 +41,37 @@ public class UserHandler {
         try {
             do {
                 try {
-                    if (isScriptMode()) {
-                        userInput = userReader.readLine();
-                        if (userInput == null) {
-                            userReader.close();
-                            userReader = readerStack.pop();
-                            Outputer.println("Executing file '" + fileScriptStack.pop().getName() + "' done!");
-                        }
+                    if (serverResponseCode == ResponseCode.ERROR || serverResponseCode == ResponseCode.SERVER_EXIT)
+                        throw new IncorrectInputInScriptException();
+                    while (!scannerStack.isEmpty() && !userScanner.hasNextLine()) {
+                        userScanner.close();
+                        userScanner = scannerStack.pop();
+                        if (!scannerStack.isEmpty()) scriptStack.pop();
+                        else return null;
                     }
-
-                    // script mode
-                    if (isScriptMode()) {
-                            Outputer.println(AppClient.PS1 + userInput);
-                    }
-                    // interactive mode
-                    else {
-                        Outputer.println("\nEnter the command:");
+                    userInput = userScanner.nextLine();
+                    if (!userInput.isEmpty()) {
                         Outputer.print(AppClient.PS1);
-                        userInput = userReader.readLine();
+                        Outputer.println(userInput);
                     }
-
-                    assert userInput != null;
                     userCommand = (userInput.trim() + " ").split(" ", 2);
                     userCommand[1] = userCommand[1].trim();
 
                 } catch (NoSuchElementException | IllegalStateException exception) {
                     Outputer.println();
-                    Outputer.printError("An error occurred while entering the command!");
+                    Outputer.printError("CommandErrorException");
                     userCommand = new String[]{"", ""};
                     rewriteAttempts++;
                     int maxRewriteAttempts = 1;
                     if (rewriteAttempts >= maxRewriteAttempts) {
-                        Outputer.printError("Number of input attempts exceeded!");
+                        Outputer.printError("RewriteAttemptsException");
                         System.exit(0);
                     }
                 }
 
                 processingCode = processCommand(userCommand[0], userCommand[1]);
 
-            } while (processingCode == ProcessingCode.ERROR && !isScriptMode() || userCommand[0].isEmpty());
+            } while (userCommand[0].isEmpty());
 
             try {
                 if (isScriptMode() && (/*serverResponseCode == ResponseCode.ERROR ||*/ processingCode == ProcessingCode.ERROR))
@@ -93,35 +88,32 @@ public class UserHandler {
                     case SCRIPT:
                         File scriptFile = new File(userCommand[1]);
                         if (!scriptFile.exists()) throw new FileNotFoundException();
-                        if (!fileScriptStack.isEmpty() && fileScriptStack.search(scriptFile) != -1)
+                        if (!scriptStack.isEmpty() && scriptStack.search(scriptFile) != -1)
                             throw new ScriptRecursionException();
-                        readerStack.push(userReader);
-                        fileScriptStack.push(scriptFile);
-                        userReader = new BufferedReader(new FileReader(scriptFile));    // bat dau doc file
-                        Outputer.println("Executing the script '" + scriptFile.getName() + "'...");
+                        scannerStack.push(userScanner);
+                        scriptStack.push(scriptFile);
+                        userScanner = new Scanner(scriptFile);    // bat dau doc file
+                        Outputer.println("ScriptRunning" + scriptFile.getName());
                         break;
                 }
             } catch (ScriptRecursionException exception) {
-                Outputer.printError("Scripts can't be called recursively! ");
+                Outputer.printError("ScriptRecursionException");
                 throw new IncorrectInputInScriptException();
             } catch (FileNotFoundException exception) {
-                Outputer.printError("Script file not found!");
+                Outputer.printError("ScriptFileNotFoundException");
+            } catch (IOException exception) {
+                exception.printStackTrace();
             }
-        } catch (IncorrectInputInScriptException | IOException exception) {
-            try {
-                Outputer.printError("Script execution interrupted!");
-                while (!readerStack.isEmpty()) {
-                    userReader.close();
-                    userReader = readerStack.pop();
-                }
-                fileScriptStack.clear();
-            } catch (IOException exception1) {
-                Outputer.printError("IOException occurred");
-                System.exit(0);
+        } catch (IncorrectInputInScriptException exception) {
+            Outputer.printError("IncorrectInputInScriptException");
+            while (!scannerStack.isEmpty()) {
+                userScanner.close();
+                userScanner = scannerStack.pop();
             }
-            return new Request(user);
+            scriptStack.clear();
+            return null;
         }
-        return new Request(userCommand[0], userCommand[1], user);
+        return new Request(userCommand[0], userCommand[1], null, user);
     }
 
 //    /**
@@ -183,12 +175,11 @@ public class UserHandler {
     }
 
     private boolean isScriptMode() {
-        return !readerStack.isEmpty();
+        return !scannerStack.isEmpty();
     }
 
-    private LabRaw generateLabToAdd() {
-        LabAsker labAsker = new LabAsker(userReader);
-        if (isScriptMode()) labAsker.setFileMode();
+    private LabRaw generateLabToAdd() throws IncorrectInputInScriptException {
+        LabAsker labAsker = new LabAsker(userScanner);
         return new LabRaw(
                 labAsker.askName(),
                 labAsker.askCoordinates(),
@@ -200,9 +191,8 @@ public class UserHandler {
         );
     }
 
-    private LabRaw generateLabToUpdate() {
-        LabAsker labAsker = new LabAsker(userReader);
-        if (isScriptMode()) labAsker.setFileMode();
+    private LabRaw generateLabToUpdate() throws IncorrectInputInScriptException {
+        LabAsker labAsker = new LabAsker(userScanner);
 
         String name = null;
         Coordinates coordinates = null;
@@ -219,8 +209,8 @@ public class UserHandler {
                 Outputer.println("\t(0) Name\n\t(1) Coordinates\n\t(2) MinimalPoint\n\t(3) TunedInWorks" +
                         "\n\t(4) AveragePoint\n\t(5) Difficulty\n\t(6) Discipline\n\t(7) Done!");
                 Outputer.print(AppClient.PS2);
-                BufferedReader reader = labAsker.getUserReader();
-                int option = Integer.parseInt(reader.readLine().trim());
+                Scanner scanner = labAsker.getUserReader();
+                int option = Integer.parseInt(scanner.nextLine().trim());
                 switch (option) {
                     case (0): name = labAsker.askName();
                         Outputer.println("The name is updated!");
@@ -251,8 +241,6 @@ public class UserHandler {
                 Outputer.printError("Require a number!");
             } catch (NotInDeclaredLimitsException exception){
                 Outputer.printError("Number must be in range [0-7]");
-            } catch (IOException exception) {
-                exception.printStackTrace();
             }
         } while (!done);
         return new LabRaw(name, coordinates, minimalPoint,
@@ -264,7 +252,7 @@ public class UserHandler {
         Outputer.print(AppClient.PS2);
         String id = new BufferedReader(new InputStreamReader(System.in)).readLine();
 
-        LabAsker labAsker = new LabAsker(userReader);
+        LabAsker labAsker = new LabAsker(userScanner);
         if (labAsker.areYouSure())
             return id;
         else return "no";

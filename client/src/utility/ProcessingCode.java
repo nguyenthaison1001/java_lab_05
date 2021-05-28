@@ -3,7 +3,7 @@ package utility;
 /**
  * Enum of all processing codes.
  */
-public enum  ProcessingCode {
+public enum ProcessingCode {
     OK,
     ERROR,
     OBJECT,

@@ -1,14 +1,11 @@
 package data;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * X-Y coordinates.
  */
-@XmlRootElement
 public class Coordinates implements Serializable {
     private Integer x; //Значение поля должно быть больше -881, Поле не может быть null
     private long y;
@@ -24,7 +21,6 @@ public class Coordinates implements Serializable {
     /**
      * Get X coordinates.
      */
-    @XmlElement
     public Integer getX() {
         return x;
     }
@@ -32,7 +28,6 @@ public class Coordinates implements Serializable {
     /**
      * Get Y coordinates.
      */
-    @XmlElement
     public long getY() {
         return y;
     }

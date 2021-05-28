@@ -26,14 +26,15 @@ public class SumMiniPointCommand extends AbstractCommand {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             if (collectionManager.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
-
             long sum = collectionManager.getSumMiniPoint();
-            ResponseOutputer.appendln("Sum of minimal point = " + sum);
+            ResponseOutputer.append("SumOfMiniPoint");
+            ResponseOutputer.appendArgs(String.valueOf(sum));
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendError("Collection is empty!");
+            ResponseOutputer.appendError("CollectionIsEmptyException");
         }
         return false;
     }

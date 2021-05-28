@@ -19,18 +19,21 @@ public class LoginCommand extends AbstractCommand {
     public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-            if (databaseUserManager.checkUserByUsernameAndPassword(user))
-                ResponseOutputer.appendln("Пользователь " + user.getUsername() + " авторизован.");
+            if (databaseUserManager.checkUserByUsernameAndPassword(user)){
+                ResponseOutputer.append("UserAuthorized");
+                ResponseOutputer.appendArgs(user.getUsername());
+            }
             else throw new UserIsNotFoundException();
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendln("Использование: эммм...эээ.это внутренняя команда...");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (ClassCastException exception) {
-            ResponseOutputer.appendError("Переданный клиентом объект неверен!");
+            ResponseOutputer.appendError("ClientObjectException");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         } catch (UserIsNotFoundException exception) {
-            ResponseOutputer.appendError("Неправильные имя пользователя или пароль!");
+            ResponseOutputer.appendError("InvalidUserException");
         }
         return false;
     }

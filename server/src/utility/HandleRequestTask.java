@@ -10,10 +10,12 @@ import java.util.concurrent.Callable;
 public class HandleRequestTask implements Callable<Response> {
     private final Request request;
     private final CommandManager commandManager;
+    private final CollectionManager collectionManager;
 
-    public HandleRequestTask(Request request, CommandManager commandManager) {
+    public HandleRequestTask(Request request, CommandManager commandManager, CollectionManager collectionManager) {
         this.request = request;
         this.commandManager = commandManager;
+        this.collectionManager = collectionManager;
     }
 
     /**
@@ -34,7 +36,8 @@ public class HandleRequestTask implements Callable<Response> {
                 request.getCommandObjectArg(),
                 hashedUser
         );
-        return new Response(responseCode, ResponseOutputer.getAndClearBuffer());
+        return new Response(responseCode, ResponseOutputer.getAndClearBuffer(), ResponseOutputer.getArgsAndClear(),
+                collectionManager.getLabCollection());
     }
 
     public ResponseCode executeCommand(String commandName, String commandStringArg,

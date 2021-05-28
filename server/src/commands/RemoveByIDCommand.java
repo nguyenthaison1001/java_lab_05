@@ -39,24 +39,23 @@ public class RemoveByIDCommand extends AbstractCommand {
             databaseCollectionManager.deleteLabByID(id);
             collectionManager.getLabCollection().remove(labToRemove);
 
-            ResponseOutputer.appendln("Removed successfully!");
+            ResponseOutputer.append("LabWorkWasDeleted");
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
+            ResponseOutputer.appendWarning("CollectionIsEmptyException");
         } catch (LabWorkNotFoundException exception) {
-            ResponseOutputer.appendError("LabWork ID not found!");
+            ResponseOutputer.appendError("IdOfLabWorkException");
         } catch (NumberFormatException exception) {
-            ResponseOutputer.appendError("ID must be a number!");
+            ResponseOutputer.appendError("IdMustBeNumberException");
         } catch (PermissionDeniedException exception) {
-            ResponseOutputer.appendError("Недостаточно прав для выполнения данной команды!");
-            ResponseOutputer.appendln("Принадлежащие другим пользователям объекты доступны только для чтения.");
+            ResponseOutputer.appendError("LackRightsException");
         } catch (ManualDatabaseEditException exception) {
-            ResponseOutputer.appendError("Произошло прямое изменение базы данных!");
-            ResponseOutputer.appendln("Перезапустите клиент для избежания возможных ошибок.");
+            ResponseOutputer.appendError("ManualDatabaseException");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         }
         return false;
     }

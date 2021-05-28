@@ -34,18 +34,17 @@ public class ClearCollectionCommand extends AbstractCommand {
             }
             databaseCollectionManager.clearCollection();
             collectionManager.getLabCollection().clear();
-            ResponseOutputer.appendln("Cleared successfully!");
+            ResponseOutputer.append("ClearCollection");
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         } catch (PermissionDeniedException exception) {
-            ResponseOutputer.appendError("Недостаточно прав для выполнения данной команды!");
-            ResponseOutputer.appendln("Принадлежащие другим пользователям объекты доступны только для чтения.");
+            ResponseOutputer.appendError("LackRightsException");
         } catch (ManualDatabaseEditException exception) {
-            ResponseOutputer.appendError("Произошло прямое изменение базы данных!");
-            ResponseOutputer.appendln("Перезапустите клиент для избежания возможных ошибок.");
+            ResponseOutputer.appendError("ManualDatabaseException");
         }
         return false;
     }

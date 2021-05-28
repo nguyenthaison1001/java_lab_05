@@ -30,11 +30,6 @@ public class RemoveGreaterCommand extends AbstractCommand {
             if (stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             if (collectionManager.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
 
-            if (stringArg.equals("no")) {
-                ResponseOutputer.appendln("Remove greater failed!");
-                return true;
-            }
-
             int id = Integer.parseInt(stringArg);
             LabWork labToAssign = collectionManager.getLabByID(id);
             if (labToAssign == null) throw new LabWorkNotFoundException();
@@ -49,25 +44,25 @@ public class RemoveGreaterCommand extends AbstractCommand {
                 collectionManager.removeFromCollection(labWork);
             }
 
-            ResponseOutputer.appendln("Removed greater successfully!");
+            collectionManager.sortByID();
+            ResponseOutputer.append("LabWorkWasDeleted");
 
             return true;
         } catch (LabWorkNotFoundException exception) {
-            ResponseOutputer.appendError("LabWork not found!");
+            ResponseOutputer.appendError("LabWorkException");
         } catch (NumberFormatException exception) {
-            ResponseOutputer.appendError("ID must be a number!");
+            ResponseOutputer.appendError("IdMustBeNumberException");
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
+            ResponseOutputer.appendWarning("CollectionIsEmptyException");
         } catch (PermissionDeniedException exception) {
-            ResponseOutputer.appendError("Недостаточно прав для выполнения данной команды!");
-            ResponseOutputer.appendln("Принадлежащие другим пользователям объекты доступны только для чтения.");
+            ResponseOutputer.appendError("LackRightsException");
         } catch (ManualDatabaseEditException exception) {
-            ResponseOutputer.appendError("Произошло прямое изменение базы данных!");
-            ResponseOutputer.appendln("Перезапустите клиент для избежания возможных ошибок.");
+            ResponseOutputer.appendError("ManualDatabaseException");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         }
         return false;
     }

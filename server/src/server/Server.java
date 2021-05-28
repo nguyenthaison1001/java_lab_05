@@ -10,13 +10,15 @@ import java.util.concurrent.TimeUnit;
 public class Server {
     private final int port;
     private CommandManager commandManager;
+    private CollectionManager collectionManager;
     private boolean isStopped;
     private Semaphore semaphore;
     private ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
 
-    public Server(int port, int maxClients, CommandManager commandManager) {
+    public Server(int port, int maxClients, CommandManager commandManager, CollectionManager collectionManager) {
         this.port = port;
         this.commandManager = commandManager;
+        this.collectionManager = collectionManager;
         this.semaphore = new Semaphore(maxClients);
     }
 
@@ -26,7 +28,7 @@ public class Server {
                 try {
                     acquireConnection();
                     if (isStopped()) throw new ConnectionErrorException();
-                    forkJoinPool.invoke(new ConnectionHandler(this, port, commandManager));
+                    forkJoinPool.invoke(new ConnectionHandler(this, port, commandManager, collectionManager));
                 } catch (ConnectionErrorException exception) {
                     break;
                 }

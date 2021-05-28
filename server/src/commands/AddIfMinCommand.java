@@ -32,33 +32,20 @@ public class AddIfMinCommand extends AbstractCommand {
         try {
             if (!stringArg.isEmpty() || objectArg == null) throw new WrongFormatCommandException();
             LabRaw labRaw = (LabRaw) objectArg;
-
-            LabWork labToAdd = new LabWork(
-                    labRaw.getId(),
-                    labRaw.getName(),
-                    labRaw.getCoordinates(),
-                    labRaw.getCreationDate(),
-                    labRaw.getMinimalPoint(),
-                    labRaw.getTunedInWorks(),
-                    labRaw.getAveragePoint(),
-                    labRaw.getDifficulty(),
-                    labRaw.getDiscipline(),
-                    user
-            );
-
             CollectionManager listSortAve = collectionManager;
             listSortAve.getLabCollection().sort(Comparator.comparingInt(LabWork::getAveragePoint));
 
-            if (collectionManager.getLabCollection().isEmpty() || labToAdd.compareTo(listSortAve.getFirst()) < 0) {
-                databaseCollectionManager.insertLab(labRaw, user);
-                collectionManager.getLabCollection().add(labToAdd);
-                ResponseOutputer.appendln("Added successfully!");
+            if (collectionManager.getLabCollection().isEmpty() || labRaw.compareTo(listSortAve.getFirst()) < 0) {
+                collectionManager.getLabCollection().add(databaseCollectionManager.insertLab(labRaw, user));
+                collectionManager.sortByID();
+                ResponseOutputer.append("LabWorkWasAdded");
                 return true;
-            } else ResponseOutputer.appendln("AveragePoint is not the smallest. Add failed!");
+            } else ResponseOutputer.append("AveragePointNotSmallest");
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         }
         return false;
     }

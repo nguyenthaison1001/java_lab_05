@@ -3,6 +3,7 @@ package utility;
 import data.Coordinates;
 import data.Difficulty;
 import data.Discipline;
+
 import data.LabWork;
 import exceptions.DatabaseHandlingException;
 import interaction.LabRaw;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class DatabaseCollectionManager {
@@ -128,6 +130,7 @@ public class DatabaseCollectionManager {
             while (resultSet.next()) {
                 labCollection.add(createLab(resultSet));
             }
+            labCollection.sort(Comparator.comparingInt(LabWork::getId));
         } catch (SQLException exception) {
             throw new DatabaseHandlingException();
         } finally {
@@ -372,7 +375,7 @@ public class DatabaseCollectionManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet.next();
         } catch (SQLException exception) {
-            AppServer.LOGGER.severe("");
+            AppServer.LOGGER.severe("Произошла ошибка при выполнении запроса SELECT_LAB_BY_ID_AND_USER_ID!");
             throw new DatabaseHandlingException();
         } finally {
             databaseHandler.closePreparedStatement(preparedStatement);

@@ -27,13 +27,17 @@ public class FilterStartWithNameCommand extends AbstractCommand {
             if (collectionManager.getLabCollection().isEmpty()) throw new CollectionIsEmptyException();
 
             String filter = collectionManager.filterStartWithName(stringArg);
-            if (!filter.isEmpty()) ResponseOutputer.appendln(filter);
-            else ResponseOutputer.appendln("No such LabWork with this name found!");
+            if (!filter.isEmpty()) {
+                ResponseOutputer.append("LabStartWith");
+                ResponseOutputer.appendArgs(stringArg, filter);
+            }
+            else ResponseOutputer.append("NoSuchLabWithName");
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
+            ResponseOutputer.appendWarning("CollectionIsEmptyException");
         }
         return false;
     }

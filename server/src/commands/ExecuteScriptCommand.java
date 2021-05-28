@@ -21,7 +21,8 @@ public class ExecuteScriptCommand extends AbstractCommand {
             if (stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendln("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         }
         return false;
     }

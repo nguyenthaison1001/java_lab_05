@@ -10,5 +10,6 @@
     <orderEntry type="module" module-name="lab_05.common" />
     <orderEntry type="module" module-name="nhap" />
     <orderEntry type="library" name="postgresql-42.2.19" level="project" />
+    <orderEntry type="module" module-name="lab_05.client" />
   </component>
 </module>

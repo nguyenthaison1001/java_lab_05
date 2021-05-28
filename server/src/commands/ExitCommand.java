@@ -2,7 +2,6 @@ package commands;
 
 import exceptions.WrongFormatCommandException;
 import interaction.User;
-import utility.CollectionManager;
 import utility.ResponseOutputer;
 
 /**
@@ -22,7 +21,8 @@ public class ExitCommand extends AbstractCommand {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         }
         return false;
     }

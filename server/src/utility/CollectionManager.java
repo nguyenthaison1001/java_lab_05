@@ -2,25 +2,16 @@ package utility;
 
 import data.LabWork;
 import exceptions.DatabaseHandlingException;
-import interaction.LabRaw;
-import interaction.User;
 import server.AppServer;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.NavigableSet;
-import java.util.TreeSet;
 
 public class CollectionManager {
     private LinkedList<LabWork> labCollection;
     private ZonedDateTime lastInitTime;
-    private DatabaseCollectionManager databaseCollectionManager;
+    private final DatabaseCollectionManager databaseCollectionManager;
 
     public CollectionManager(DatabaseCollectionManager databaseCollectionManager) {
         this.databaseCollectionManager = databaseCollectionManager;

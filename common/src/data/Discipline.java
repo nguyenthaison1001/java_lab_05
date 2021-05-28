@@ -1,14 +1,11 @@
 package data;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Class operates Discipline.
  */
-@XmlRootElement
 public class Discipline implements Serializable {
     private String name; //Поле не может быть null, Строка не может быть пустой
     private int labsCount;
@@ -23,7 +20,6 @@ public class Discipline implements Serializable {
     /**
      * Get name of Discipline.
      */
-    @XmlElement
     public String getName() {
         return name;
     }
@@ -31,7 +27,6 @@ public class Discipline implements Serializable {
     /**
      * Get the number of labs.
      */
-    @XmlElement
     public int getLabsCount() {
         return labsCount;
     }

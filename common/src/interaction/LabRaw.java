@@ -3,11 +3,8 @@ package interaction;
 import data.Coordinates;
 import data.Difficulty;
 import data.Discipline;
-import utility.ZonedDateTimeXMLAdapter;
+import data.LabWork;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -15,8 +12,7 @@ import java.util.Objects;
 /**
  * Class operates object 'LabWork'.
  */
-@XmlRootElement
-public class LabRaw implements Serializable {
+public class LabRaw implements Comparable<LabWork>, Serializable {
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -42,7 +38,6 @@ public class LabRaw implements Serializable {
     /**
      * @return ID of the LabWork.
      */
-    @XmlElement
     public Integer getId() {
         return id;
     }
@@ -50,7 +45,6 @@ public class LabRaw implements Serializable {
     /**
      * @return Name of the LabWork.
      */
-    @XmlElement
     public String getName() {
         return name;
     }
@@ -58,7 +52,6 @@ public class LabRaw implements Serializable {
     /**
      * @return Coordinates of the LabWork.
      */
-    @XmlElement
     public Coordinates getCoordinates() {
         return coordinates;
     }
@@ -66,8 +59,6 @@ public class LabRaw implements Serializable {
     /**
      * @return Time of the LabWork.
      */
-    @XmlElement
-    @XmlJavaTypeAdapter(ZonedDateTimeXMLAdapter.class)
     public ZonedDateTime getCreationDate() {
         return creationDate;
     }
@@ -75,7 +66,6 @@ public class LabRaw implements Serializable {
     /**
      * @return MinimalPoint of the LabWork.
      */
-    @XmlElement
     public Long getMinimalPoint() {
         return minimalPoint;
     }
@@ -83,7 +73,6 @@ public class LabRaw implements Serializable {
     /**
      * @return TunedInWork of the LabWork.
      */
-    @XmlElement
     public Integer getTunedInWorks() {
         return tunedInWorks;
     }
@@ -91,7 +80,6 @@ public class LabRaw implements Serializable {
     /**
      * @return AveragePoint of the LabWork.
      */
-    @XmlElement
     public Integer getAveragePoint() {
         return averagePoint;
     }
@@ -99,7 +87,6 @@ public class LabRaw implements Serializable {
     /**
      * @return Difficulty of the LabWork.
      */
-    @XmlElement
     public Difficulty getDifficulty() {
         return difficulty;
     }
@@ -107,7 +94,6 @@ public class LabRaw implements Serializable {
     /**
      * @return Discipline of the LabWork.
      */
-    @XmlElement
     public Discipline getDiscipline() {
         return discipline;
     }
@@ -178,5 +164,11 @@ public class LabRaw implements Serializable {
     public int hashCode() {
         return Objects.hash(id, name, coordinates);
     }
+
+    @Override
+    public int compareTo(LabWork labOther) {
+        return averagePoint.compareTo(labOther.getAveragePoint());
+    }
+
 }
 

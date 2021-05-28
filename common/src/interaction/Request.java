@@ -6,7 +6,7 @@ public class Request implements Serializable {
     private final String commandName;
     private final String commandStringArg;
     private final Serializable commandObjectArg;
-    private User user;
+    private final User user;
 
     public Request(String commandName, String commandStringArg, Serializable commandObjectArg, User user) {
         this.commandName = commandName;

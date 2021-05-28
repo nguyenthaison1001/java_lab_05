@@ -30,12 +30,13 @@ public class AddCommand extends AbstractCommand {
             if (!stringArg.isEmpty() || objectArg == null) throw new WrongFormatCommandException();
             LabRaw labRaw = (LabRaw) objectArg;
             collectionManager.getLabCollection().add(databaseCollectionManager.insertLab(labRaw, user));
-            ResponseOutputer.appendln("LabWork added successfully!");
+            ResponseOutputer.append("LabWorkWasAdded");
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         }
         return false;
     }

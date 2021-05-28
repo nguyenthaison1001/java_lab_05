@@ -20,13 +20,16 @@ public class ConnectionHandler extends RecursiveAction {
     private final int port;
     private DatagramChannel channel;
     private final CommandManager commandManager;
+    private CollectionManager collectionManager;
     private final ExecutorService processCachedThreadPool = Executors.newCachedThreadPool();
     private final ExecutorService sendCachedThreadPool = Executors.newCachedThreadPool();
 
-    public ConnectionHandler(Server server, int port, CommandManager commandManager) {
+    public ConnectionHandler(Server server, int port, CommandManager commandManager,
+                             CollectionManager collectionManager) {
         this.server = server;
         this.port = port;
         this.commandManager = commandManager;
+        this.collectionManager = collectionManager;
     }
 
     /**
@@ -125,8 +128,10 @@ public class ConnectionHandler extends RecursiveAction {
         ObjectInputStream ois = new ObjectInputStream(bais);
 
         con.request = (Request) ois.readObject();
-        Future<Response> responseFuture = processCachedThreadPool.submit(new HandleRequestTask(con.request, commandManager));
+        Future<Response> responseFuture = processCachedThreadPool.submit(new HandleRequestTask(con.request, commandManager, collectionManager));
         con.response = responseFuture.get();
+
+        System.out.println(con.request);
 
         AppServer.LOGGER.info("Processing request " + con.request.getCommandName() + "...");
 
@@ -141,6 +146,9 @@ public class ConnectionHandler extends RecursiveAction {
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
                 ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(baos));
+
+                System.out.println(con.response);
+
                 oos.writeObject(con.response);
                 oos.flush();
 

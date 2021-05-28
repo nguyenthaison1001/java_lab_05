@@ -24,10 +24,11 @@ public class ShowCommand extends AbstractCommand {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             collectionManager.sortByID();
-            ResponseOutputer.appendln(collectionManager.showCollection());
+            ResponseOutputer.append(collectionManager.showCollection());
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         }
         return false;
     }

@@ -35,16 +35,17 @@ public class CountLessThanDiffCommand extends AbstractCommand {
                 if (diff.compareTo(labWork.getDifficulty()) > 0)
                     count += 1;
             }
-            ResponseOutputer.appendln("The number of elements = " + count);
+            ResponseOutputer.append("NumberOfLabs");
+            ResponseOutputer.appendArgs(String.valueOf(count));
             return true;
 
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
+            ResponseOutputer.appendWarning("CollectionIsEmptyException");
         } catch (IllegalArgumentException exception) {
-            ResponseOutputer.appendError("This difficulty isn't in list!");
-            ResponseOutputer.appendln("List of difficulties: " + Difficulty.nameList());
+            ResponseOutputer.appendError("NotInList");
         }
         return false;
     }

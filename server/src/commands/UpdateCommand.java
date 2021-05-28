@@ -78,33 +78,24 @@ public class UpdateCommand extends AbstractCommand {
                     user
             );
             collectionManager.getLabCollection().add(newLab);
-
-            System.out.println(newLab);
-
-//            ResponseOutputer.appendln("The old lab: \n" + oldLab);
-//            ResponseOutputer.appendln("The new lab: \n" + newLab);
-
-            ResponseOutputer.appendln("Updated successfully!");
-
+            collectionManager.sortByID();
+            ResponseOutputer.append("LabWorkUpdated");
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendWarning("Using: '" + getName() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         } catch (NumberFormatException exception) {
-            ResponseOutputer.appendError("ID must be a number > 0!");
+            ResponseOutputer.appendError("IdMustBeNumberException");
         } catch (LabWorkNotFoundException exception) {
-            ResponseOutputer.appendError("LabWork not found!");
+            ResponseOutputer.appendError("LabWorkException");
         } catch (CollectionIsEmptyException exception) {
-            ResponseOutputer.appendWarning("Collection is empty!");
-        } catch (NullPointerException exception) {
-            ResponseOutputer.appendError("Argument is null (NullPointerException)!");
+            ResponseOutputer.appendWarning("CollectionIsEmptyException");
         } catch (PermissionDeniedException exception) {
-            ResponseOutputer.appendError("Insufficient rights to execute this command!");
-            ResponseOutputer.appendln("Objects owned by other users are read-only.");
+            ResponseOutputer.appendError("LackRightsException");
         } catch (ManualDatabaseEditException exception) {
-            ResponseOutputer.appendError("There was a direct database change!!");
-            ResponseOutputer.appendln("Restart the client to avoid possible errors.");
+            ResponseOutputer.appendError("ManualDatabaseException");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         }
         return false;
     }

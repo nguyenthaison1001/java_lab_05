@@ -13,23 +13,22 @@ import java.util.logging.*;
  */
 public class AppServer {
     private static final int MAX_CLIENTS = 1000;
-//    public static final int port = 4387;
+    public static int port = 4387;
     public static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    private static int port;
-
-
-    private static String databaseHost;
-    private static String databaseURL ;
-    private static String databaseUsername = "s291124";
-    private static String databasePassword;
+//    private static int port;
 
 //    private static String databaseHost;
-//    private static String databaseURL = "jdbc:postgresql://localhost:5678/studs";
-//    private static String databaseUsername = "postgres";
-//    private static String databasePassword = "postgres";
+//    private static String databaseURL ;
+//    private static String databaseUsername = "s291124";
+//    private static String databasePassword;
+
+    private static String databaseHost;
+    private static String databaseURL = "jdbc:postgresql://localhost:5678/studs";
+    private static String databaseUsername = "postgres";
+    private static String databasePassword = "postgres";
 
     public static void main(String[] args) {
-        if (!initialize(args)) return;
+//        if (!initialize(args)) return;
 
         DatabaseHandler databaseHandler = new DatabaseHandler(databaseURL, databaseUsername, databasePassword);
         DatabaseUserManager databaseUserManager = new DatabaseUserManager(databaseHandler);
@@ -55,7 +54,7 @@ public class AppServer {
                 new LoginCommand(databaseUserManager),
                 new RegisterCommand(databaseUserManager)
         );
-        Server server = new Server(port, MAX_CLIENTS, commandManager);
+        Server server = new Server(port, MAX_CLIENTS, commandManager, collectionManager);
         server.run();
         databaseHandler.closeConnection();
     }

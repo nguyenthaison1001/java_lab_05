@@ -4,150 +4,119 @@ import client.AppClient;
 import data.Coordinates;
 import data.Difficulty;
 import data.Discipline;
+import data.LabWork;
+import exceptions.IncorrectInputInScriptException;
 import exceptions.MustBeNotEmptyException;
 import exceptions.NotInDeclaredLimitsException;
 
-
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Operates questions to ask user about LabWork's value.
  */
 public class LabAsker {
-    private BufferedReader userReader;
-    private boolean fileMode;
+    private final Scanner userScanner;
 
-    public LabAsker(BufferedReader userReader) {
-        this.userReader = userReader;
-    }
-
-    /**
-     * Sets a reader to read user input.
-     * @param userReader Scanner to set.
-     */
-    public void setUserReader(BufferedReader userReader) {
-        this.userReader = userReader;
+    public LabAsker(Scanner userScanner) {
+        this.userScanner = userScanner;
     }
 
     /**
      * @return userReader which uses for user input.
      */
-    public BufferedReader getUserReader() {
-        return userReader;
-    }
-
-    /**
-     * Sets LabWork asker mode to 'File Mode'.
-     */
-    public void setFileMode() {
-        fileMode = true;
-    }
-
-    /**
-     * Sets LabWork asker mode to 'User Mode'.
-     */
-    public void setUserMode() {
-        fileMode = false;
+    public Scanner getUserReader() {
+        return userScanner;
     }
 
     /**
      * Asks a user the LabWork's name.
      * @return LabWork's name.
      */
-    public String askName()  {
+    public String askName() throws IncorrectInputInScriptException {
         String name;
-        while (true) {
-            try {
-                Outputer.println("Enter the name: ");
-                Outputer.print(AppClient.PS2);
-                name = userReader.readLine().trim();
-                if (fileMode) Outputer.println(name);
-                if (name.equals("")) throw new MustBeNotEmptyException();
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (NoSuchElementException exception) {
-                Outputer.printError("Name not recognized!");
-            } catch (MustBeNotEmptyException exception) {
-                Outputer.printError("Name can't be empty!");
-            } catch (IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterName");
+            Outputer.print(AppClient.PS2);
+            name = userScanner.nextLine().trim();
+            Outputer.println(name);
+            if (name.equals("")) throw new MustBeNotEmptyException();
+            return name;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("NameNotIdentifiedException");
+        } catch (MustBeNotEmptyException exception) {
+            Outputer.printError("NameEmptyException");
+        } catch (IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return name;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's X coordinate.
      * @return LabWork's X coordinate.
      */
-    public Integer askX() {
+    public Integer askX() throws IncorrectInputInScriptException {
         String strX;
         int x;
-        while (true) {
-            int x_BIGGER_THAN = -881;
-            try {
-                Outputer.println("Enter coordinate of X >" + x_BIGGER_THAN +": ");
-                Outputer.print(AppClient.PS2);
-                strX = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strX);
-                if (strX.equals("")) throw new MustBeNotEmptyException();
-                x = Integer.parseInt(strX);
-                if (x <= x_BIGGER_THAN) throw new NotInDeclaredLimitsException();
-                break;
-            } catch (MustBeNotEmptyException exception) {
-                Outputer.printError("X-coordinate can't be empty!");
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (NotInDeclaredLimitsException exception) {
-                Outputer.printError("X-coordinate must be greater than " + x_BIGGER_THAN + "!");
-            } catch (NumberFormatException exception) {
-                Outputer.printError("X-coordinate must be a number!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterX", String.valueOf(LabWork.MIN_X));
+            Outputer.print(AppClient.PS2);
+            strX = userScanner.nextLine().trim();
+            Outputer.println(strX);
+            if (strX.equals("")) throw new MustBeNotEmptyException();
+            x = Integer.parseInt(strX);
+            if (x <= LabWork.MIN_X) throw new NotInDeclaredLimitsException();
+            return x;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("XNotIdentifiedException");
+        } catch (MustBeNotEmptyException exception) {
+            Outputer.printError("XEmptyException");
+        } catch (NotInDeclaredLimitsException exception) {
+            Outputer.printError("XMustBeGreaterException", String.valueOf(LabWork.MIN_X));
+        } catch (NumberFormatException exception) {
+            Outputer.printError("XMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return x;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's Y coordinate.
      * @return LabWork's Y coordinate.
      */
-    public long askY() {
+    public long askY() throws IncorrectInputInScriptException {
         String strY;
         long y;
-        while (true) {
-            try {
-                Outputer.println("Enter coordinate of Y: ");
-                Outputer.print(AppClient.PS2);
-                strY = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strY);
-                y = Long.parseLong(strY);
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (NumberFormatException exception) {
-                Outputer.printError("Y-coordinate must be a number!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterY");
+            Outputer.print(AppClient.PS2);
+            strY = userScanner.nextLine().trim();
+            Outputer.println(strY);
+            y = Long.parseLong(strY);
+            return y;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("YNotIdentifiedException");
+        } catch (NumberFormatException exception) {
+            Outputer.printError("YMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return y;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's coordinate.
      * @return LabWork's coordinate.
      */
-    public Coordinates askCoordinates() {
+    public Coordinates askCoordinates() throws IncorrectInputInScriptException {
         Integer x = askX();
         long y = askY();
         return new Coordinates(x, y);
@@ -157,188 +126,174 @@ public class LabAsker {
      * Asks a user the LabWork's MinimalPoint.
      * @return LabWork's MinimalPoint.
      */
-    public long askMinimalPoint() {
+    public long askMinimalPoint() throws IncorrectInputInScriptException {
         String strMinimalPoint;
         long minimalPoint;
-        while (true) {
-            long MINIMALPOINT_BIGGER_THAN = 0;
-            try {
-                Outputer.println("Enter minimal point > " + MINIMALPOINT_BIGGER_THAN +": ");
-                Outputer.print(AppClient.PS2);
-                strMinimalPoint = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strMinimalPoint);
-                if (strMinimalPoint.equals("")) throw new MustBeNotEmptyException();
-                minimalPoint = Long.parseLong(strMinimalPoint);
-                if (minimalPoint <= MINIMALPOINT_BIGGER_THAN) throw new NotInDeclaredLimitsException();
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (MustBeNotEmptyException exception) {
-                Outputer.printError("Minimal Point can't be empty!");
-            } catch (NotInDeclaredLimitsException exception) {
-                Outputer.printError("Minimal point must be bigger than " + MINIMALPOINT_BIGGER_THAN + "!");
-            } catch (NumberFormatException exception) {
-                Outputer.printError("Minimal point must be a number!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterMinimalPoint", String.valueOf(LabWork.MINIMALPOINT_BIGGER_THAN + 1));
+            Outputer.print(AppClient.PS2);
+            strMinimalPoint = userScanner.nextLine().trim();
+            Outputer.println(strMinimalPoint);
+            if (strMinimalPoint.equals("")) throw new MustBeNotEmptyException();
+            minimalPoint = Long.parseLong(strMinimalPoint);
+            if (minimalPoint <= LabWork.MINIMALPOINT_BIGGER_THAN) throw new NotInDeclaredLimitsException();
+            return minimalPoint;
+        } catch (MustBeNotEmptyException exception) {
+            Outputer.printError("MinimalPointMustBeNotEmptyException");
+        } catch (NotInDeclaredLimitsException exception) {
+            Outputer.printError("MinimalPointMustBeBiggerException", String.valueOf(LabWork.MINIMALPOINT_BIGGER_THAN));
+        } catch (NumberFormatException exception) {
+            Outputer.printError("MinimalPointMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return minimalPoint;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's TunedInWorks.
      * @return LabWork's TunedInWorks.
      */
-    public int askTunedInWorks() {
+    public int askTunedInWorks() throws IncorrectInputInScriptException {
         String strTunedInWorks;
         int tunedInWorks;
-        while (true) {
-            try {
-                Outputer.println("Enter tuned in works: ");
-                Outputer.print(AppClient.PS2);
-                strTunedInWorks = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strTunedInWorks);
-                if (strTunedInWorks.equals("")) throw new MustBeNotEmptyException();
-                tunedInWorks = Integer.parseInt(strTunedInWorks);
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (MustBeNotEmptyException exception) {
-                Outputer.printError("Tuned in works can't be empty!");
-            } catch (NumberFormatException exception) {
-                Outputer.printError("Tuned in works must be a number!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.out.println(Arrays.toString(exception.getStackTrace()));
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterTunedInWorks");
+            Outputer.print(AppClient.PS2);
+            strTunedInWorks = userScanner.nextLine().trim();
+            Outputer.println(strTunedInWorks);
+            if (strTunedInWorks.equals("")) throw new MustBeNotEmptyException();
+            tunedInWorks = Integer.parseInt(strTunedInWorks);
+            return tunedInWorks;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("TunedInWorksNotIdentifiedException");
+        } catch (MustBeNotEmptyException exception) {
+            Outputer.printError("TunedInWorksMustBeNotEmptyException");
+        } catch (NumberFormatException exception) {
+            Outputer.printError("TunedInWorksMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return tunedInWorks;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's AveragePoint.
      * @return LabWork's AveragePoint.
      */
-    public int askAveragePoint() {
+    public int askAveragePoint() throws IncorrectInputInScriptException {
         String strAveragePoint;
         int averagePoint;
-        while (true) {
-            int AVERAGEPOINT_BIGGER_THAN = 0;
-            try {
-                Outputer.println("Enter average point > " + AVERAGEPOINT_BIGGER_THAN + ": ");
-                Outputer.print(AppClient.PS2);
-                strAveragePoint = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strAveragePoint);
-                averagePoint = Integer.parseInt(strAveragePoint);
-                if (averagePoint <= AVERAGEPOINT_BIGGER_THAN) throw new NotInDeclaredLimitsException();
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (NotInDeclaredLimitsException e) {
-                Outputer.printError("Average point must be bigger than " + AVERAGEPOINT_BIGGER_THAN + "!");
-            } catch (NumberFormatException exception) {
-                Outputer.printError("Average point must be represented by number!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterAveragePoint", String.valueOf(LabWork.AVERAGEPOINT_BIGGER_THAN + 1));
+            Outputer.print(AppClient.PS2);
+            strAveragePoint = userScanner.nextLine().trim();
+            Outputer.println(strAveragePoint);
+            averagePoint = Integer.parseInt(strAveragePoint);
+            if (averagePoint <= LabWork.AVERAGEPOINT_BIGGER_THAN) throw new NotInDeclaredLimitsException();
+            return averagePoint;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("AveragePointNotIdentifiedException");
+        } catch (NotInDeclaredLimitsException e) {
+            Outputer.printError("AveragePointMustBeBiggerException", String.valueOf(LabWork.AVERAGEPOINT_BIGGER_THAN));
+        } catch (NumberFormatException exception) {
+            Outputer.printError("AveragePointMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return averagePoint;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's Difficulty.
      * @return LabWork's Difficulty.
      */
-    public Difficulty askDifficulty() {
+    public Difficulty askDifficulty() throws IncorrectInputInScriptException {
         String strDifficulty;
         Difficulty difficulty;
-        while (true) {
-            try {
-                Outputer.println("List of difficulties: " + Difficulty.nameList());
-                Outputer.println("Enter Difficulty: ");
-                Outputer.print(AppClient.PS2);
-                strDifficulty = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strDifficulty);
-                difficulty = Difficulty.valueOf(strDifficulty.toUpperCase());
-                break;
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (IllegalArgumentException exception) {
-                Outputer.printError("This difficulty not listed!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("DifficultyList" + Difficulty.nameList());
+            Outputer.println("EnterDifficulty");
+            Outputer.print(AppClient.PS2);
+            strDifficulty = userScanner.nextLine().trim();
+            Outputer.println(strDifficulty);
+            difficulty = Difficulty.valueOf(strDifficulty.toUpperCase());
+            return difficulty;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("DifficultyNotIdentifiedException");
+        } catch (IllegalArgumentException exception) {
+            Outputer.printError("NoSuchDifficultyException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return difficulty;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's NameOfDiscipline.
      * @return LabWork's NameOfDiscipline.
      */
-    public String askNameOfDiscipline() {
-        String nameDiscipline;
-        while (true) {
-            try {
-                Outputer.println("Enter name of Discipline: ");
-                Outputer.print(AppClient.PS2);
-                nameDiscipline = userReader.readLine().trim();
-                if (fileMode) Outputer.println(nameDiscipline);
-                if (nameDiscipline.equals("")) throw new MustBeNotEmptyException();
-                break;
-            } catch (MustBeNotEmptyException exception) {
-                Outputer.printError("Name of discipline can't be empty!");
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (IllegalArgumentException exception) {
-                Outputer.printError("This difficulty not listed!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+    public String askDisciplineName() throws IncorrectInputInScriptException {
+        String disciplineName;
+        try {
+            Outputer.println("EnterDisciplineName");
+            Outputer.print(AppClient.PS2);
+            disciplineName = userScanner.nextLine().trim();
+            Outputer.println();
+            if (disciplineName.equals("")) throw new MustBeNotEmptyException();
+            return disciplineName;
+        } catch (MustBeNotEmptyException exception) {
+            Outputer.printError("DisciplineNameMustBeNotEmptyException");
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("DisciplineNameNotIdentifiedException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return nameDiscipline;
+        throw new IncorrectInputInScriptException();
     }
 
     /**
      * Asks a user the LabWork's MinimalPoint.
      * @return LabWork's MinimalPoint.
      */
-    public int askLabsCountOfDiscipline() {
+    public int askLabsCountOfDiscipline() throws IncorrectInputInScriptException {
         String strLabsCountDiscipline;
         int labsCountDiscipline;
-        while (true) {
-            try {
-                Outputer.println("Enter the number of labs of Discipline: ");
-                Outputer.print(AppClient.PS2);
-                strLabsCountDiscipline = userReader.readLine().trim();
-                if (fileMode) Outputer.println(strLabsCountDiscipline);
-//                if (strLabsCountDiscipline.equals("")) break;
-                labsCountDiscipline = Integer.parseInt(strLabsCountDiscipline);
-                break;
-            } catch (NumberFormatException exception) {
-                Outputer.printError("The number of labs must be a number!");
-            } catch (IOException exception) {
-                Outputer.printError("Interrupted I/O operations!");
-            } catch (NullPointerException | IllegalStateException exception) {
-                Outputer.printError("Unexpected error!");
-                System.exit(0);
-            }
+        try {
+            Outputer.println("EnterLabsCount");
+            Outputer.print(AppClient.PS2);
+            strLabsCountDiscipline = userScanner.nextLine().trim();
+            Outputer.println(strLabsCountDiscipline);
+            labsCountDiscipline = Integer.parseInt(strLabsCountDiscipline);
+            return labsCountDiscipline;
+        } catch (NoSuchElementException exception) {
+            Outputer.printError("LabsCountNotIdentifiedException");
+        } catch (NumberFormatException exception) {
+            Outputer.printError("LabsCountMustBeNumberException");
+        } catch (NullPointerException | IllegalStateException exception) {
+            Outputer.printError("UnexpectedException");
+            OutputerUI.error("UnexpectedException");
+            System.exit(0);
         }
-        return labsCountDiscipline;
-    }
+        throw new IncorrectInputInScriptException();
+}
 
     /**
      * Asks a user the LabWork's Discipline.
      * @return LabWork's Discipline.
      */
-    public Discipline askDiscipline() {
-        String nameDiscipline = askNameOfDiscipline();
+    public Discipline askDiscipline() throws IncorrectInputInScriptException {
+        String nameDiscipline = askDisciplineName();
         int labsCount = askLabsCountOfDiscipline();
         return new Discipline(nameDiscipline, labsCount);
     }
@@ -349,23 +304,18 @@ public class LabAsker {
      */
     public boolean areYouSure() {
         String answer;
-        try {
-            while (true) {
-                Outputer.printWarning("Are you sure? (yes/no)");
-                Outputer.print(AppClient.PS2);
-                answer = userReader.readLine().trim();
-                if (fileMode) Outputer.println(answer);
-                switch (answer) {
-                    case "yes":
-                        return true;
-                    case "no" :
-                        return false;
-                    default: Outputer.printWarning("Yes or no?");
-                }
+        while (true) {
+            Outputer.printWarning("Are you sure? (yes/no)");
+            Outputer.print(AppClient.PS2);
+            answer = userScanner.nextLine().trim();
+            switch (answer) {
+                case "yes":
+                    return true;
+                case "no" :
+                    return false;
+                default: Outputer.printWarning("Yes or no?");
             }
-        } catch (IOException exception) {
-            Outputer.printError("Interrupted I/O operations!");
-        } return false;
+        }
     }
 
     @Override

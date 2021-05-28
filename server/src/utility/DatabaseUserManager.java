@@ -20,7 +20,7 @@ public class DatabaseUserManager {
             DatabaseHandler.USER_TABLE_USERNAME_COLUMN + ", " +
             DatabaseHandler.USER_TABLE_PASSWORD_COLUMN + ") VALUES (?, ?)";
 
-    private DatabaseHandler databaseHandler;
+    private final DatabaseHandler databaseHandler;
 
     public DatabaseUserManager(DatabaseHandler databaseHandler) {
         this.databaseHandler = databaseHandler;
@@ -102,8 +102,6 @@ public class DatabaseUserManager {
             if (resultSet.next()) {
                 userId = resultSet.getInt(DatabaseHandler.USER_TABLE_ID_COLUMN);
             } else userId = -1;
-
-            System.out.println(userId);
 
             return userId;
         } catch (SQLException exception) {

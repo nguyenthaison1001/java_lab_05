@@ -22,7 +22,8 @@ public class HelpCommand extends AbstractCommand {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendln("Использование: '" + getName() + " " + getUsage() + "'");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");
         }
         return false;
     }

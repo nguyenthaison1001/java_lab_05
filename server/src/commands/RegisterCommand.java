@@ -24,18 +24,21 @@ public class RegisterCommand extends AbstractCommand {
     public boolean execute(String stringArg, Object objectArg, User user) {
         try {
             if (!stringArg.isEmpty() || objectArg != null) throw new WrongFormatCommandException();
-            if (databaseUserManager.insertUser(user))
-                ResponseOutputer.appendln("Пользователь " + user.getUsername() + " зарегистрирован.");
+            if (databaseUserManager.insertUser(user)) {
+                ResponseOutputer.append("UserRegistered");
+                ResponseOutputer.appendArgs(user.getUsername());
+            }
             else throw new UserAlreadyExists();
             return true;
         } catch (WrongFormatCommandException exception) {
-            ResponseOutputer.appendln("Использование: эммм...эээ.это внутренняя команда...");
-        } catch (ClassCastException exception) {
-            ResponseOutputer.appendError("Переданный клиентом объект неверен!");
+            ResponseOutputer.append("Using");
+            ResponseOutputer.appendArgs(getName() + " " + getUsage() + "'");        } catch (ClassCastException exception) {
+            ResponseOutputer.appendError("ClientObjectException");
         } catch (DatabaseHandlingException exception) {
-            ResponseOutputer.appendError("Произошла ошибка при обращении к базе данных!");
+            ResponseOutputer.appendError("DatabaseHandlingException");
         } catch (UserAlreadyExists exception) {
-            ResponseOutputer.appendError("Пользователь " + user.getUsername() + " уже существует!");
+            ResponseOutputer.append("UserExistsException");
+            ResponseOutputer.appendArgs(user.getUsername());
         }
         return false;
     }
